@@ -280,10 +280,7 @@ impl RegistryClient {
         version: &str,
     ) -> Result<String, ForgeKitError> {
         self.get_package_info_internal(name, version).await?;
-        Ok(format!(
-            "Package: {}\nVersion: {}",
-            name, version
-        ))
+        Ok(format!("Package: {}\nVersion: {}", name, version))
     }
 
     /// Get package information (internal)
