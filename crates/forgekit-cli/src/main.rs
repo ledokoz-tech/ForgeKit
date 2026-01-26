@@ -71,21 +71,30 @@ async fn main() -> Result<()> {
             println!("   forgekit build");
         }
         Commands::Build { path } => {
-            let project_path = path.unwrap_or_else(|| std::env::current_dir()?);
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
             let forgekit = ForgeKit::new();
             
             forgekit.build_project(&project_path).await?;
             println!("✅ Build completed successfully");
         }
         Commands::Package { path } => {
-            let project_path = path.unwrap_or_else(|| std::env::current_dir()?);
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
             let forgekit = ForgeKit::new();
             
             let package_path = forgekit.package_project(&project_path).await?;
             println!("✅ Package created at {:?}", package_path);
         }
         Commands::BuildPackage { path } => {
-            let project_path = path.unwrap_or_else(|| std::env::current_dir()?);
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
             let forgekit = ForgeKit::new();
             
             // Build first
@@ -97,7 +106,10 @@ async fn main() -> Result<()> {
             println!("✅ Package created at {:?}", package_path);
         }
         Commands::Run { path } => {
-            let project_path = path.unwrap_or_else(|| std::env::current_dir()?);
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
             let forgekit = ForgeKit::new();
             
             // Build first
