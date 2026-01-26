@@ -4,7 +4,6 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use forgekit_core::ForgeKit;
 use std::path::PathBuf;
-use tracing_subscriber;
 
 #[derive(Parser)]
 #[command(name = "forgekit")]
