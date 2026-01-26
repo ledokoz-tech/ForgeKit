@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use forgekit_core::ForgeKit;
+use forgekit_core::{ForgeKit, templates::TemplateType, dependencies::DependencyManager};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -23,6 +23,9 @@ enum Commands {
         /// Path where to create the project (defaults to current directory)
         #[arg(short, long)]
         path: Option<PathBuf>,
+        /// Template type to use
+        #[arg(short, long, default_value = "basic")]
+        template: String,
     },
     /// Build the current project
     Build {
@@ -48,6 +51,38 @@ enum Commands {
         #[arg(short, long)]
         path: Option<PathBuf>,
     },
+    /// Add a dependency to the project
+    Add {
+        /// Package name to add
+        package: String,
+        /// Version to install
+        #[arg(short, long, default_value = "*")]
+        version: String,
+        /// Path to the project (defaults to current directory)
+        #[arg(short, long)]
+        path: Option<PathBuf>,
+    },
+    /// Remove a dependency from the project
+    Remove {
+        /// Package name to remove
+        package: String,
+        /// Path to the project (defaults to current directory)
+        #[arg(short, long)]
+        path: Option<PathBuf>,
+    },
+    /// Update project dependencies
+    Update {
+        /// Path to the project (defaults to current directory)
+        #[arg(short, long)]
+        path: Option<PathBuf>,
+    },
+    /// Search for available packages
+    Search {
+        /// Search query
+        query: String,
+    },
+    /// List available templates
+    Templates,
 }
 
 #[tokio::main]
@@ -58,12 +93,25 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::New { name, path } => {
+        Commands::New { name, path, template } => {
             let project_path = path.unwrap_or_else(|| PathBuf::from(&name));
             let forgekit = ForgeKit::new();
-
-            forgekit.init_project(&name, &project_path).await?;
-            println!("✅ Created new project '{}' at {:?}", name, project_path);
+                
+            // Parse template type
+            let template_type = match template.as_str() {
+                "basic" => TemplateType::Basic,
+                "gui" => TemplateType::Gui,
+                "cli" => TemplateType::Cli,
+                "service" => TemplateType::Service,
+                "plugin" => TemplateType::Plugin,
+                _ => {
+                    eprintln!("Unknown template: {}. Using basic template.", template);
+                    TemplateType::Basic
+                }
+            };
+                
+            forgekit.init_project_with_template(&name, &project_path, template_type).await?;
+            println!("✅ Created new {} project '{}' at {:?}", template, name, project_path);
             println!("📁 Navigate to the project directory:");
             println!("   cd {}", project_path.display());
             println!("🔨 Build your project:");
@@ -135,6 +183,57 @@ async fn main() -> Result<()> {
                     status.code().unwrap_or(-1)
                 );
             }
+        }
+        Commands::Add { package, version, path } => {
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
+            
+            let dep_manager = DependencyManager::new();
+            dep_manager.add_dependency(&project_path, &package, &version).await?;
+            println!("✅ Added dependency: {} v{}", package, version);
+        }
+        Commands::Remove { package, path } => {
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
+            
+            let dep_manager = DependencyManager::new();
+            dep_manager.remove_dependency(&project_path, &package).await?;
+            println!("✅ Removed dependency: {}", package);
+        }
+        Commands::Update { path } => {
+            let project_path = match path {
+                Some(p) => p,
+                None => std::env::current_dir()?,
+            };
+            
+            let dep_manager = DependencyManager::new();
+            dep_manager.update_dependencies(&project_path).await?;
+            println!("✅ Dependencies updated");
+        }
+        Commands::Search { query } => {
+            let dep_manager = DependencyManager::new();
+            let results = dep_manager.search_packages(&query);
+            
+            if results.is_empty() {
+                println!("No packages found matching '{}'", query);
+            } else {
+                println!("Found {} packages:", results.len());
+                for pkg in results {
+                    println!("  {} - {}", pkg.name, pkg.description);
+                }
+            }
+        }
+        Commands::Templates => {
+            println!("Available templates:");
+            println!("  basic    - Basic application template");
+            println!("  gui      - Graphical user interface application");
+            println!("  cli      - Command-line interface tool");
+            println!("  service  - Background service/daemon");
+            println!("  plugin   - ForgeKit plugin library");
         }
     }
 

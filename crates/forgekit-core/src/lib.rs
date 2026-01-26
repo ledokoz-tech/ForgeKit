@@ -5,9 +5,11 @@
 
 pub mod builder;
 pub mod config;
+pub mod dependencies;
 pub mod error;
 pub mod packager;
 pub mod project;
+pub mod templates;
 
 /// The main ForgeKit library
 pub struct ForgeKit;
@@ -25,6 +27,16 @@ impl ForgeKit {
         path: &std::path::Path,
     ) -> Result<(), error::ForgeKitError> {
         project::init(name, path).await
+    }
+
+    /// Initialize a new project with a specific template
+    pub async fn init_project_with_template(
+        &self,
+        name: &str,
+        path: &std::path::Path,
+        template: templates::TemplateType,
+    ) -> Result<(), error::ForgeKitError> {
+        templates::generate_from_template(name, template, path).await
     }
 
     /// Build a project
