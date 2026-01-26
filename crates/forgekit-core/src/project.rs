@@ -8,29 +8,29 @@ use tokio::fs;
 /// Initialize a new project at the given path
 pub async fn init(name: &str, path: &Path) -> Result<(), ForgeKitError> {
     tracing::info!("Initializing new project '{}' at {:?}", name, path);
-    
+
     // Check if directory exists
     if path.exists() {
         return Err(ForgeKitError::ProjectExists(
-            path.to_string_lossy().to_string()
+            path.to_string_lossy().to_string(),
         ));
     }
-    
+
     // Create project directory
     fs::create_dir_all(path).await?;
-    
+
     // Create src directory
     let src_path = path.join("src");
     fs::create_dir_all(&src_path).await?;
-    
+
     // Create assets directory
     let assets_path = path.join("assets");
     fs::create_dir_all(&assets_path).await?;
-    
+
     // Create initial main.rs
     let main_rs_content = generate_main_rs(name);
     fs::write(src_path.join("main.rs"), main_rs_content).await?;
-    
+
     // Create forgekit.toml
     let config = ProjectConfig {
         name: name.to_string(),
@@ -40,11 +40,11 @@ pub async fn init(name: &str, path: &Path) -> Result<(), ForgeKitError> {
         ..Default::default()
     };
     config.save(path.join("forgekit.toml"))?;
-    
+
     // Create .gitignore
     let gitignore_content = generate_gitignore();
     fs::write(path.join(".gitignore"), gitignore_content).await?;
-    
+
     tracing::info!("Project '{}' initialized successfully", name);
     Ok(())
 }

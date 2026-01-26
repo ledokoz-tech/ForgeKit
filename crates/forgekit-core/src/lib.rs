@@ -3,11 +3,11 @@
 //! This crate provides the core functionality for building, packaging,
 //! and managing `.mox` applications for Ledokoz OS.
 
-pub mod config;
-pub mod project;
 pub mod builder;
-pub mod packager;
+pub mod config;
 pub mod error;
+pub mod packager;
+pub mod project;
 
 /// The main ForgeKit library
 pub struct ForgeKit;
@@ -19,7 +19,11 @@ impl ForgeKit {
     }
 
     /// Initialize a new project
-    pub async fn init_project(&self, name: &str, path: &std::path::Path) -> Result<(), error::ForgeKitError> {
+    pub async fn init_project(
+        &self,
+        name: &str,
+        path: &std::path::Path,
+    ) -> Result<(), error::ForgeKitError> {
         project::init(name, path).await
     }
 
@@ -29,7 +33,10 @@ impl ForgeKit {
     }
 
     /// Package a project into a .mox file
-    pub async fn package_project(&self, path: &std::path::Path) -> Result<std::path::PathBuf, error::ForgeKitError> {
+    pub async fn package_project(
+        &self,
+        path: &std::path::Path,
+    ) -> Result<std::path::PathBuf, error::ForgeKitError> {
         packager::package(path).await
     }
 }
