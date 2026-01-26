@@ -67,25 +67,27 @@ pub async fn package(project_path: &Path) -> Result<PathBuf, ForgeKitError> {
 }
 
 /// Recursively add assets to the ZIP archive
-async fn add_assets_to_zip(
+fn add_assets_to_zip(
     zip: &mut ZipWriter<std::fs::File>,
     assets_path: &Path,
     options: FileOptions,
 ) -> Result<(), ForgeKitError> {
-    let mut entries = fs::read_dir(assets_path).await?;
+    // Use synchronous file operations to avoid async recursion issues
+    let entries = std::fs::read_dir(assets_path)?;
     
-    while let Some(entry) = entries.next_entry().await? {
+    for entry in entries {
+        let entry = entry?;
         let path = entry.path();
         let name = path.strip_prefix(assets_path)
             .map_err(|_| ForgeKitError::PackagingFailed("Failed to strip prefix".to_string()))?;
         
         if path.is_file() {
-            let data = fs::read(&path).await?;
+            let data = std::fs::read(&path)?;
             let zip_path = format!("assets/{}", name.to_string_lossy());
             zip.start_file(&zip_path, options)?;
             zip.write_all_data(&data)?;
         } else if path.is_dir() {
-            add_assets_to_zip(zip, &path, options).await?;
+            add_assets_to_zip(zip, &path, options)?;
         }
     }
     
