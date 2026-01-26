@@ -246,7 +246,10 @@ impl RegistryClient {
         version: &str,
     ) -> Result<PathBuf, ForgeKitError> {
         // Check if already cached
-        let cache_path = self.config.cache_dir.join(format!("{}-{}.tar.gz", name, version));
+        let cache_path = self
+            .config
+            .cache_dir
+            .join(format!("{}-{}.tar.gz", name, version));
         if cache_path.exists() {
             return Ok(cache_path);
         }
@@ -255,7 +258,11 @@ impl RegistryClient {
         let package_info = self.get_package_info(name, version).await?;
 
         // Download from GitHub
-        let download_url = format!("https://github.com/{}/archive/refs/tags/v{}.tar.gz", name.replace("forgekit-", ""), version);
+        let download_url = format!(
+            "https://github.com/{}/archive/refs/tags/v{}.tar.gz",
+            name.replace("forgekit-", ""),
+            version
+        );
 
         let response = self.client.get(&download_url).send().await?;
         let bytes = response.bytes().await?;
@@ -273,7 +280,10 @@ impl RegistryClient {
         version: &str,
     ) -> Result<String, ForgeKitError> {
         self.get_package_info_internal(name, version).await?;
-        Ok(format!("Package: {}\nVersion: {}", name, version))
+        Ok(format!(
+            "Package: {}\nVersion: {}",
+            name, version
+        ))
     }
 
     /// Get package information (internal)
@@ -309,7 +319,11 @@ impl RegistryClient {
         }
 
         // Fallback to GitHub API
-        let api_url = format!("https://api.github.com/repos/{}/releases/tags/v{}", name.replace("forgekit-", ""), version);
+        let api_url = format!(
+            "https://api.github.com/repos/{}/releases/tags/v{}",
+            name.replace("forgekit-", ""),
+            version
+        );
 
         let response = self.client.get(&api_url).send().await?;
         let release_info: serde_json::Value = response.json().await?;
@@ -362,7 +376,10 @@ impl RegistryClient {
                         VersionInfo {
                             version: version.to_string(),
                             git_ref: format!("v{}", version),
-                            archive_url: format!("https://github.com/ledokoz-tech/{}/archive/v{}.tar.gz", name, version),
+                            archive_url: format!(
+                                "https://github.com/ledokoz-tech/{}/archive/v{}.tar.gz",
+                                name, version
+                            ),
                             published: chrono::Utc::now().to_rfc3339(),
                             checksum: "".to_string(),
                         },
