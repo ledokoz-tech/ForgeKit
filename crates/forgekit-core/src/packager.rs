@@ -56,7 +56,7 @@ pub async fn package(project_path: &Path) -> Result<PathBuf, ForgeKitError> {
     // Add assets if they exist
     let assets_path = project_path.join("assets");
     if assets_path.exists() {
-        add_assets_to_zip(&mut zip, &assets_path, options).await?;
+        add_assets_to_zip(&mut zip, &assets_path, options)?;
     }
     
     // Finish ZIP
