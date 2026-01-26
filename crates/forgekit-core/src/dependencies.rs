@@ -72,9 +72,9 @@ impl DependencyRegistry {
         let mut resolved = Vec::new();
 
         for dep in dependencies {
-            let package = self
-                .find_package(&dep.name)
-                .ok_or_else(|| ForgeKitError::InvalidConfig(format!("Package not found: {}", dep.name)))?;
+            let package = self.find_package(&dep.name).ok_or_else(|| {
+                ForgeKitError::InvalidConfig(format!("Package not found: {}", dep.name))
+            })?;
 
             let version = self.resolve_version(package, &dep.version)?;
             resolved.push(ResolvedDependency {
@@ -151,14 +151,11 @@ impl DependencyManager {
         }
 
         // Resolve the dependency
-        let dep_info = self
-            .registry
-            .find_package(package_name)
-            .ok_or_else(|| ForgeKitError::InvalidConfig(format!("Package {} not found", package_name)))?;
+        let dep_info = self.registry.find_package(package_name).ok_or_else(|| {
+            ForgeKitError::InvalidConfig(format!("Package {} not found", package_name))
+        })?;
 
-        let _resolved_version = self
-            .registry
-            .resolve_version(dep_info, version)?;
+        let _resolved_version = self.registry.resolve_version(dep_info, version)?;
 
         // Add to config
         config.dependencies.push(Dependency {

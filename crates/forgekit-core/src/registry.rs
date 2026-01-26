@@ -120,7 +120,7 @@ impl RegistryClient {
     /// Create a new registry client
     pub fn new(config: RegistryConfig) -> Result<Self, ForgeKitError> {
         let mut builder = reqwest::Client::builder();
-        
+
         if let Some(token) = &config.github_token {
             builder = builder.default_headers({
                 let mut headers = reqwest::header::HeaderMap::new();
@@ -132,24 +132,27 @@ impl RegistryClient {
                 headers
             });
         }
-        
+
         let client = builder.build()?;
-        
+
         // Ensure directories exist
         fs::create_dir_all(&config.cache_dir)?;
         fs::create_dir_all(&config.index_dir)?;
-        
+
         Ok(Self { config, client })
     }
 
     /// Search for packages
-    pub async fn search_packages(&self, query: &str) -> Result<Vec<PackageMetadata>, ForgeKitError> {
+    pub async fn search_packages(
+        &self,
+        query: &str,
+    ) -> Result<Vec<PackageMetadata>, ForgeKitError> {
         // First check local index
         let local_results = self.search_local_index(query).await?;
         if !local_results.is_empty() {
             return Ok(local_results);
         }
-        
+
         // Fall back to GitHub search
         self.search_github_packages(query).await
     }
@@ -158,14 +161,15 @@ impl RegistryClient {
     async fn search_local_index(&self, query: &str) -> Result<Vec<PackageMetadata>, ForgeKitError> {
         let mut results = Vec::new();
         let index_path = self.config.index_dir.join("packages.json");
-        
+
         if index_path.exists() {
             let content = fs::read_to_string(&index_path)?;
             let index: HashMap<String, IndexEntry> = serde_json::from_str(&content)?;
-            
+
             for (name, entry) in index {
-                if name.contains(query) 
-                    || entry.versions.values().any(|v| v.version.contains(query)) {
+                if name.contains(query)
+                    || entry.versions.values().any(|v| v.version.contains(query))
+                {
                     // Convert to PackageMetadata (simplified)
                     results.push(PackageMetadata {
                         name: name.clone(),
@@ -178,7 +182,9 @@ impl RegistryClient {
                         categories: vec![],
                         dependencies: vec![],
                         targets: vec!["ledokoz".to_string()],
-                        release_date: entry.versions.get(&entry.latest)
+                        release_date: entry
+                            .versions
+                            .get(&entry.latest)
                             .map(|v| v.published.clone())
                             .unwrap_or_default(),
                         downloads: 0,
@@ -186,22 +192,25 @@ impl RegistryClient {
                 }
             }
         }
-        
+
         Ok(results)
     }
 
     /// Search GitHub for ForgeKit packages
-    async fn search_github_packages(&self, query: &str) -> Result<Vec<PackageMetadata>, ForgeKitError> {
+    async fn search_github_packages(
+        &self,
+        query: &str,
+    ) -> Result<Vec<PackageMetadata>, ForgeKitError> {
         let search_url = format!(
             "https://api.github.com/search/repositories?q={}+topic:forgekit-package&sort=stars&order=desc",
             query
         );
-        
+
         let response = self.client.get(&search_url).send().await?;
         let json: serde_json::Value = response.json().await?;
-        
+
         let mut packages = Vec::new();
-        
+
         if let Some(items) = json["items"].as_array() {
             for item in items.iter().take(20) {
                 // Extract package info
@@ -209,7 +218,7 @@ impl RegistryClient {
                 let full_name = item["full_name"].as_str().unwrap_or("").to_string();
                 let description = item["description"].as_str().unwrap_or("").to_string();
                 let html_url = item["html_url"].as_str().unwrap_or("").to_string();
-                
+
                 packages.push(PackageMetadata {
                     name,
                     version: "0.1.0".to_string(), // Default version
@@ -226,7 +235,7 @@ impl RegistryClient {
                 });
             }
         }
-        
+
         Ok(packages)
     }
 
@@ -237,38 +246,45 @@ impl RegistryClient {
         version: &str,
     ) -> Result<PathBuf, ForgeKitError> {
         // Check if already cached
-        let cache_path = self.config.cache_dir.join(format!("{}-{}.tar.gz", name, version));
+        let cache_path = self
+            .config
+            .cache_dir
+            .join(format!("{}-{}.tar.gz", name, version));
         if cache_path.exists() {
             return Ok(cache_path);
         }
-        
+
         // Get package info
         let package_info = self.get_package_info(name, version).await?;
-        
+
         // Download from GitHub
         let download_url = format!(
             "https://github.com/{}/archive/refs/tags/v{}.tar.gz",
             name.replace("forgekit-", ""),
             version
         );
-        
+
         let response = self.client.get(&download_url).send().await?;
         let bytes = response.bytes().await?;
-        
+
         // Save to cache
         tokio_fs::write(&cache_path, bytes).await?;
-        
+
         Ok(cache_path)
     }
 
     /// Get package information
-    async fn get_package_info(&self, name: &str, version: &str) -> Result<PackageMetadata, ForgeKitError> {
+    async fn get_package_info(
+        &self,
+        name: &str,
+        version: &str,
+    ) -> Result<PackageMetadata, ForgeKitError> {
         // Try to get from local index first
         let index_path = self.config.index_dir.join("packages.json");
         if index_path.exists() {
             let content = fs::read_to_string(&index_path)?;
             let index: HashMap<String, IndexEntry> = serde_json::from_str(&content)?;
-            
+
             if let Some(entry) = index.get(name) {
                 if let Some(version_info) = entry.versions.get(version) {
                     return Ok(PackageMetadata {
@@ -288,18 +304,24 @@ impl RegistryClient {
                 }
             }
         }
-        
+
         // Fallback to GitHub API
-        let api_url = format!("https://api.github.com/repos/{}/releases/tags/v{}", 
-                             name.replace("forgekit-", ""), version);
-        
+        let api_url = format!(
+            "https://api.github.com/repos/{}/releases/tags/v{}",
+            name.replace("forgekit-", ""),
+            version
+        );
+
         let response = self.client.get(&api_url).send().await?;
         let release_info: serde_json::Value = response.json().await?;
-        
+
         Ok(PackageMetadata {
             name: name.to_string(),
             version: version.to_string(),
-            description: release_info["body"].as_str().unwrap_or("No description").to_string(),
+            description: release_info["body"]
+                .as_str()
+                .unwrap_or("No description")
+                .to_string(),
             authors: vec![name.split('/').next().unwrap_or("").to_string()],
             repository: format!("https://github.com/{}", name),
             license: "MIT".to_string(),
@@ -307,7 +329,10 @@ impl RegistryClient {
             categories: vec![],
             dependencies: vec![],
             targets: vec!["ledokoz".to_string()],
-            release_date: release_info["published_at"].as_str().unwrap_or("").to_string(),
+            release_date: release_info["published_at"]
+                .as_str()
+                .unwrap_or("")
+                .to_string(),
             downloads: 0,
         })
     }
@@ -317,9 +342,9 @@ impl RegistryClient {
         // This would typically fetch from a central registry
         // For now, we'll create a basic index
         let index_path = self.config.index_dir.join("packages.json");
-        
+
         let mut index = HashMap::new();
-        
+
         // Add some sample packages to the index
         let sample_packages = [
             ("forgekit-serde", "0.1.0"),
@@ -327,30 +352,35 @@ impl RegistryClient {
             ("forgekit-http", "0.1.0"),
             ("forgekit-gui", "0.1.0"),
         ];
-        
+
         for (name, version) in &sample_packages {
             let entry = IndexEntry {
                 name: name.to_string(),
                 versions: {
                     let mut versions = HashMap::new();
-                    versions.insert(version.to_string(), VersionInfo {
-                        version: version.to_string(),
-                        git_ref: format!("v{}", version),
-                        archive_url: format!("https://github.com/ledokoz-tech/{}/archive/v{}.tar.gz", 
-                                           name, version),
-                        published: chrono::Utc::now().to_rfc3339(),
-                        checksum: "".to_string(),
-                    });
+                    versions.insert(
+                        version.to_string(),
+                        VersionInfo {
+                            version: version.to_string(),
+                            git_ref: format!("v{}", version),
+                            archive_url: format!(
+                                "https://github.com/ledokoz-tech/{}/archive/v{}.tar.gz",
+                                name, version
+                            ),
+                            published: chrono::Utc::now().to_rfc3339(),
+                            checksum: "".to_string(),
+                        },
+                    );
                     versions
                 },
                 latest: version.to_string(),
             };
             index.insert(name.to_string(), entry);
         }
-        
+
         let index_json = serde_json::to_string_pretty(&index)?;
         fs::write(&index_path, index_json)?;
-        
+
         Ok(())
     }
 

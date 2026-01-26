@@ -50,7 +50,7 @@ async fn generate_basic_template(name: &str, path: &Path) -> Result<(), ForgeKit
     fs::create_dir_all(path).await?;
     fs::create_dir_all(path.join("src")).await?;
     fs::create_dir_all(path.join("assets")).await?;
-    
+
     // Generate main.rs
     let main_content = format!(
         r#"//! Main application for {name}
@@ -66,7 +66,7 @@ fn main() {{
 "#
     );
     fs::write(path.join("src").join("main.rs"), main_content).await?;
-    
+
     Ok(())
 }
 
@@ -76,7 +76,7 @@ async fn generate_gui_template(name: &str, path: &Path) -> Result<(), ForgeKitEr
     fs::create_dir_all(path.join("src")).await?;
     fs::create_dir_all(path.join("assets")).await?;
     fs::create_dir_all(path.join("ui")).await?;
-    
+
     // Generate main.rs with GUI setup
     let main_content = format!(
         r#"//! GUI application for {name}
@@ -95,7 +95,7 @@ fn main() {{
 "#
     );
     fs::write(path.join("src").join("main.rs"), main_content).await?;
-    
+
     // Create UI layout file
     let ui_content = r#"<!-- Default UI layout -->
 <window title="Application" width="800" height="600">
@@ -106,7 +106,7 @@ fn main() {{
 </window>
 "#;
     fs::write(path.join("ui").join("main.xml"), ui_content).await?;
-    
+
     Ok(())
 }
 
@@ -114,7 +114,7 @@ async fn generate_cli_template(name: &str, path: &Path) -> Result<(), ForgeKitEr
     fs::create_dir_all(path).await?;
     fs::create_dir_all(path.join("src")).await?;
     fs::create_dir_all(path.join("src").join("commands")).await?;
-    
+
     let main_content = format!(
         r#"//! CLI tool: {name}
 //!
@@ -161,14 +161,14 @@ fn main() {{
 "#
     );
     fs::write(path.join("src").join("main.rs"), main_content).await?;
-    
+
     Ok(())
 }
 
 async fn generate_service_template(name: &str, path: &Path) -> Result<(), ForgeKitError> {
     fs::create_dir_all(path).await?;
     fs::create_dir_all(path.join("src")).await?;
-    
+
     let main_content = format!(
         r#"//! Service/Daemon: {name}
 //!
@@ -199,14 +199,14 @@ async fn initialize_service() -> Result<(), Box<dyn std::error::Error>> {{
 "#
     );
     fs::write(path.join("src").join("main.rs"), main_content).await?;
-    
+
     Ok(())
 }
 
 async fn generate_plugin_template(name: &str, path: &Path) -> Result<(), ForgeKitError> {
     fs::create_dir_all(path).await?;
     fs::create_dir_all(path.join("src")).await?;
-    
+
     let lib_content = format!(
         r#"//! Plugin library: {name}
 //!
@@ -238,9 +238,15 @@ impl Plugin for {name_cap}Plugin {{
 // Export the plugin
 forgekit_core::export_plugin!({name_cap}Plugin);
 "#,
-        name_cap = name.chars().next().unwrap().to_uppercase().collect::<String>() + &name[1..]
+        name_cap = name
+            .chars()
+            .next()
+            .unwrap()
+            .to_uppercase()
+            .collect::<String>()
+            + &name[1..]
     );
     fs::write(path.join("src").join("lib.rs"), lib_content).await?;
-    
+
     Ok(())
 }

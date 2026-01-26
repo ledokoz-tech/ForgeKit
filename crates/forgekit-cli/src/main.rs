@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use forgekit_core::{ForgeKit, templates::TemplateType, package_manager::PackageManager};
+use forgekit_core::{package_manager::PackageManager, templates::TemplateType, ForgeKit};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -93,10 +93,14 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::New { name, path, template } => {
+        Commands::New {
+            name,
+            path,
+            template,
+        } => {
             let project_path = path.unwrap_or_else(|| PathBuf::from(&name));
             let forgekit = ForgeKit::new();
-                
+
             // Parse template type
             let template_type = match template.as_str() {
                 "basic" => TemplateType::Basic,
@@ -109,9 +113,14 @@ async fn main() -> Result<()> {
                     TemplateType::Basic
                 }
             };
-                
-            forgekit.init_project_with_template(&name, &project_path, template_type).await?;
-            println!("✅ Created new {} project '{}' at {:?}", template, name, project_path);
+
+            forgekit
+                .init_project_with_template(&name, &project_path, template_type)
+                .await?;
+            println!(
+                "✅ Created new {} project '{}' at {:?}",
+                template, name, project_path
+            );
             println!("📁 Navigate to the project directory:");
             println!("   cd {}", project_path.display());
             println!("🔨 Build your project:");
@@ -184,12 +193,16 @@ async fn main() -> Result<()> {
                 );
             }
         }
-        Commands::Add { package, version, path } => {
+        Commands::Add {
+            package,
+            version,
+            path,
+        } => {
             let project_path = match path {
                 Some(p) => p,
                 None => std::env::current_dir()?,
             };
-            
+
             let package_manager = PackageManager::new(project_path.clone())?;
             package_manager.add_dependency(&package, &version).await?;
             println!("✅ Added dependency: {} v{}", package, version);
@@ -199,7 +212,7 @@ async fn main() -> Result<()> {
                 Some(p) => p,
                 None => std::env::current_dir()?,
             };
-            
+
             let package_manager = PackageManager::new(project_path.clone())?;
             package_manager.remove_dependency(&package).await?;
             println!("✅ Removed dependency: {}", package);
@@ -209,7 +222,7 @@ async fn main() -> Result<()> {
                 Some(p) => p,
                 None => std::env::current_dir()?,
             };
-            
+
             let package_manager = PackageManager::new(project_path.clone())?;
             package_manager.update_dependencies().await?;
             println!("✅ Dependencies updated");
@@ -218,7 +231,7 @@ async fn main() -> Result<()> {
             let current_dir = std::env::current_dir()?;
             let package_manager = PackageManager::new(current_dir)?;
             let results = package_manager.search_packages(&query).await?;
-            
+
             if results.is_empty() {
                 println!("No packages found matching '{}'", query);
             } else {
