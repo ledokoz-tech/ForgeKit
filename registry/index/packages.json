@@ -1,0 +1,41 @@
+{
+  "forgekit-serde": {
+    "name": "forgekit-serde",
+    "versions": {
+      "0.1.0": {
+        "version": "0.1.0",
+        "git_ref": "v0.1.0",
+        "archive_url": "https://github.com/ledokoz-tech/forgekit-serde/archive/v0.1.0.tar.gz",
+        "published": "2026-01-26T18:00:00Z",
+        "checksum": "abc123"
+      }
+    },
+    "latest": "0.1.0"
+  },
+  "forgekit-tokio": {
+    "name": "forgekit-tokio",
+    "versions": {
+      "0.1.0": {
+        "version": "0.1.0",
+        "git_ref": "v0.1.0",
+        "archive_url": "https://github.com/ledokoz-tech/forgekit-tokio/archive/v0.1.0.tar.gz",
+        "published": "2026-01-26T18:00:00Z",
+        "checksum": "def456"
+      }
+    },
+    "latest": "0.1.0"
+  },
+  "forgekit-http": {
+    "name": "forgekit-http",
+    "versions": {
+      "0.1.0": {
+        "version": "0.1.0",
+        "git_ref": "v0.1.0",
+        "archive_url": "https://github.com/ledokoz-tech/forgekit-http/archive/v0.1.0.tar.gz",
+        "published": "2026-01-26T18:00:00Z",
+        "checksum": "ghi789"
+      }
+    },
+    "latest": "0.1.0"
+  }
+}

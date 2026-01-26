@@ -2,7 +2,7 @@
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use forgekit_core::{ForgeKit, templates::TemplateType, dependencies::DependencyManager};
+use forgekit_core::{ForgeKit, templates::TemplateType, package_manager::PackageManager};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -190,8 +190,8 @@ async fn main() -> Result<()> {
                 None => std::env::current_dir()?,
             };
             
-            let dep_manager = DependencyManager::new();
-            dep_manager.add_dependency(&project_path, &package, &version).await?;
+            let package_manager = PackageManager::new(project_path.clone())?;
+            package_manager.add_dependency(&package, &version).await?;
             println!("✅ Added dependency: {} v{}", package, version);
         }
         Commands::Remove { package, path } => {
@@ -200,8 +200,8 @@ async fn main() -> Result<()> {
                 None => std::env::current_dir()?,
             };
             
-            let dep_manager = DependencyManager::new();
-            dep_manager.remove_dependency(&project_path, &package).await?;
+            let package_manager = PackageManager::new(project_path.clone())?;
+            package_manager.remove_dependency(&package).await?;
             println!("✅ Removed dependency: {}", package);
         }
         Commands::Update { path } => {
@@ -210,20 +210,21 @@ async fn main() -> Result<()> {
                 None => std::env::current_dir()?,
             };
             
-            let dep_manager = DependencyManager::new();
-            dep_manager.update_dependencies(&project_path).await?;
+            let package_manager = PackageManager::new(project_path.clone())?;
+            package_manager.update_dependencies().await?;
             println!("✅ Dependencies updated");
         }
         Commands::Search { query } => {
-            let dep_manager = DependencyManager::new();
-            let results = dep_manager.search_packages(&query);
+            let current_dir = std::env::current_dir()?;
+            let package_manager = PackageManager::new(current_dir)?;
+            let results = package_manager.search_packages(&query).await?;
             
             if results.is_empty() {
                 println!("No packages found matching '{}'", query);
             } else {
                 println!("Found {} packages:", results.len());
-                for pkg in results {
-                    println!("  {} - {}", pkg.name, pkg.description);
+                for result in results {
+                    println!("  {}", result);
                 }
             }
         }

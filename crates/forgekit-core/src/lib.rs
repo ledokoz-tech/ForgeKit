@@ -8,7 +8,9 @@ pub mod config;
 pub mod dependencies;
 pub mod error;
 pub mod packager;
+pub mod package_manager;
 pub mod project;
+pub mod registry;
 pub mod templates;
 
 /// The main ForgeKit library

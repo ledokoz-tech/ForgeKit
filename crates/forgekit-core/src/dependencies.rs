@@ -2,6 +2,7 @@
 
 use crate::config::{Dependency, ProjectConfig};
 use crate::error::ForgeKitError;
+use crate::package_manager::PackageManager;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
