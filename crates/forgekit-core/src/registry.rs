@@ -278,6 +278,19 @@ impl RegistryClient {
         &self,
         name: &str,
         version: &str,
+    ) -> Result<String, ForgeKitError> {
+        let info = self.get_package_info_internal(name, version).await?;
+        Ok(format!(
+            "Package: {}\nVersion: {}\nDescription: {}\nRepository: {}\nLicense: {}",
+            info.name, info.version, info.description, info.repository, info.license
+        ))
+    }
+
+    /// Get package information (internal)
+    async fn get_package_info_internal(
+        &self,
+        name: &str,
+        version: &str,
     ) -> Result<PackageMetadata, ForgeKitError> {
         // Try to get from local index first
         let index_path = self.config.index_dir.join("packages.json");

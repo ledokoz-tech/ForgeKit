@@ -44,7 +44,15 @@ impl DependencyRegistry {
             packages: HashMap::new(),
         }
     }
+}
 
+impl Default for DependencyRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl DependencyRegistry {
     pub fn add_package(&mut self, info: PackageInfo) {
         self.packages.insert(info.name.clone(), info);
     }

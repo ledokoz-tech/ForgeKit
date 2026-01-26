@@ -208,11 +208,7 @@ pub fn hello() {
         name: &str,
         version: &str,
     ) -> Result<String, ForgeKitError> {
-        let info = self.registry_client.get_package_info(name, version).await?;
-        Ok(format!(
-            "Package: {}\nVersion: {}\nDescription: {}\nRepository: {}\nLicense: {}",
-            info.name, info.version, info.description, info.repository, info.license
-        ))
+        self.registry_client.get_package_info(name, version).await
     }
 }
 
