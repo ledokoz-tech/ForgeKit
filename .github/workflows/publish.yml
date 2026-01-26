@@ -1,42 +1,131 @@
-name: Publish to crates.io
+name: Auto Publish to crates.io
 
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+    branches: [ main ]
+  schedule:
+    # Run daily at midnight UTC to catch any missed commits
+    - cron: '0 0 * * *'
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  publish:
-    name: Publish to crates.io
+  calculate-version:
+    name: Calculate Version and Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for commit counting
       
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
       
+      - name: Count commits
+        id: commit-count
+        run: |
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+          echo "Total commits: $COMMIT_COUNT"
+      
+      - name: Calculate version
+        id: version
+        run: |
+          COMMIT_COUNT=${{ steps.commit-count.outputs.commit_count }}
+          
+          if [ $COMMIT_COUNT -lt 10 ]; then
+            VERSION="v0.0.$COMMIT_COUNT"
+          elif [ $COMMIT_COUNT -lt 100 ]; then
+            MAJOR=0
+            MINOR=$((COMMIT_COUNT / 10))
+            PATCH=$((COMMIT_COUNT % 10))
+            VERSION="v$MAJOR.$MINOR.$PATCH"
+          elif [ $COMMIT_COUNT -lt 200 ]; then
+            MAJOR=1
+            MINOR=$(( (COMMIT_COUNT - 100) / 10 ))
+            PATCH=$(( (COMMIT_COUNT - 100) % 10 ))
+            VERSION="v$MAJOR.$MINOR.$PATCH"
+          else
+            MAJOR=$((COMMIT_COUNT / 100))
+            MINOR=$(( (COMMIT_COUNT % 100) / 10 ))
+            PATCH=$((COMMIT_COUNT % 10))
+            VERSION="v$MAJOR.$MINOR.$PATCH"
+          fi
+          
+          echo "calculated_version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Calculated version: $VERSION"
+      
+      - name: Check if tag exists
+        id: tag-check
+        run: |
+          VERSION=${{ steps.version.outputs.calculated_version }}
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag $VERSION already exists"
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag $VERSION does not exist"
+          fi
+      
+      - name: Update Cargo.toml versions
+        if: steps.tag-check.outputs.tag_exists == 'false'
+        run: |
+          VERSION=${{ steps.version.outputs.calculated_version }}
+          VERSION_NUM=${VERSION#v}  # Remove 'v' prefix
+          
+          # Update workspace version in root Cargo.toml
+          sed -i "s/^version = \".*\"/version = \"$VERSION_NUM\"/" Cargo.toml
+          
+          # Update CLI crate dependency version
+          sed -i "s/forgekit-core = { path = \"..\\/forgekit-core\" }/forgekit-core = { path = \"..\\/forgekit-core\", version = \"$VERSION_NUM\" }/" crates/forgekit-cli/Cargo.toml
+          
+          echo "Updated workspace version to $VERSION_NUM"
+      
+      - name: Commit version updates
+        if: steps.tag-check.outputs.tag_exists == 'false'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add Cargo.toml crates/forgekit-core/Cargo.toml crates/forgekit-cli/Cargo.toml
+          git commit -m "chore: Auto-update workspace to version ${{ steps.version.outputs.calculated_version }}"
+      
+      - name: Create and push tag
+        if: steps.tag-check.outputs.tag_exists == 'false'
+        run: |
+          VERSION=${{ steps.version.outputs.calculated_version }}
+          git tag $VERSION
+          git push origin $VERSION
+          echo "Created and pushed tag $VERSION"
+      
       - name: Check code quality
+        if: steps.tag-check.outputs.tag_exists == 'false'
         run: |
           cargo check --workspace
           cargo test --workspace
       
       - name: Publish forgekit-core
+        if: steps.tag-check.outputs.tag_exists == 'false'
         working-directory: ./crates/forgekit-core
         run: cargo publish --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
       
       - name: Wait for crate to be available
+        if: steps.tag-check.outputs.tag_exists == 'false'
         run: sleep 30
       
       - name: Publish forgekit-cli
+        if: steps.tag-check.outputs.tag_exists == 'false'
         working-directory: ./crates/forgekit-cli
         run: cargo publish --token ${CRATES_TOKEN}
         env:
           CRATES_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      
+      - name: Send notification (optional)
+        if: steps.tag-check.outputs.tag_exists == 'false'
+        run: |
+          echo "🎉 Successfully published version ${{ steps.version.outputs.calculated_version }} to crates.io!"
+          echo "Install with: cargo install forgekit"
