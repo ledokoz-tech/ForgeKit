@@ -1,8 +1,8 @@
 //! Error types for ForgeKit
 
+use reqwest;
 use thiserror::Error;
 use zip::result::ZipError;
-use reqwest;
 
 #[derive(Error, Debug)]
 pub enum ForgeKitError {
@@ -38,7 +38,6 @@ pub enum ForgeKitError {
 
     #[error("TOML serialization error: {0}")]
     TomlSerialization(#[from] toml::ser::Error),
-    
     #[error("HTTP client error: {0}")]
     Http(#[from] reqwest::Error),
 }
