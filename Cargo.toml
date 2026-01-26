@@ -1,0 +1,32 @@
+[workspace]
+members = [
+    "crates/forgekit-core",
+    "crates/forgekit-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/ledokoz-tech/forgekit"
+homepage = "https://ledokoz.com/forgekit"
+documentation = "https://ledokoz.com/forgekit/docs"
+description = "A modern Rust framework for building .mox applications for Ledokoz OS"
+keywords = ["ledokoz", "mox", "framework", "cli"]
+categories = ["development-tools", "command-line-utilities"]
+authors = ["Ledokoz Team <forgekit@ledokoz.com>"]
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+clap = { version = "4.5", features = ["derive"] }
+anyhow = "1.0"
+thiserror = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+tempfile = "3.10"
+zip = "0.6"
+walkdir = "2.5"
