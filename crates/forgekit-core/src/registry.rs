@@ -255,7 +255,8 @@ impl RegistryClient {
         }
 
         // Get package info
-        let package_info = self.get_package_info(name, version).await?;
+        // Get package info (side effect: validates package exists)
+        self.get_package_info(name, version).await?;
 
         // Download from GitHub
         let download_url = format!(
