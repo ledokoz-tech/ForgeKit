@@ -6,7 +6,6 @@
 use crate::config::{Dependency, ProjectConfig};
 use crate::error::ForgeKitError;
 use crate::registry::{RegistryClient, RegistryConfig};
-use std::fs;
 use std::path::{Path, PathBuf};
 use tokio::fs as tokio_fs;
 

@@ -9,7 +9,7 @@ use reqwest;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use tokio::fs as tokio_fs;
 
 /// Registry configuration
@@ -274,7 +274,7 @@ impl RegistryClient {
     }
 
     /// Get package information
-    async fn get_package_info(
+    pub async fn get_package_info(
         &self,
         name: &str,
         version: &str,
