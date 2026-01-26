@@ -35,7 +35,7 @@ pub async fn init(name: &str, path: &Path) -> Result<(), ForgeKitError> {
     let config = ProjectConfig {
         name: name.to_string(),
         version: "0.1.0".to_string(),
-        description: Some(format!("A new .mox app built with ForgeKit")),
+        description: Some("A new .mox app built with ForgeKit".to_string()),
         authors: vec![whoami::username()],
         ..Default::default()
     };
