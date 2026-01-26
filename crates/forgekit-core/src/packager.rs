@@ -2,6 +2,7 @@
 
 use crate::config::ProjectConfig;
 use crate::error::ForgeKitError;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use tokio::fs;
 use zip::{write::FileOptions, ZipWriter};
@@ -45,12 +46,12 @@ pub async fn package(project_path: &Path) -> Result<PathBuf, ForgeKitError> {
     // Add binary to archive
     let binary_data = fs::read(&binary_path).await?;
     zip.start_file("app.bin", options)?;
-    zip.write_all(&binary_data)?;
+    zip.write_all_data(&binary_data)?;
     
     // Add config to archive
     let config_data = toml::to_string_pretty(&config)?;
     zip.start_file("forgekit.toml", options)?;
-    zip.write_all(config_data.as_bytes())?;
+    zip.write_all_data(config_data.as_bytes())?;
     
     // Add assets if they exist
     let assets_path = project_path.join("assets");
@@ -82,7 +83,7 @@ async fn add_assets_to_zip(
             let data = fs::read(&path).await?;
             let zip_path = format!("assets/{}", name.to_string_lossy());
             zip.start_file(&zip_path, options)?;
-            zip.write_all(&data)?;
+            zip.write_all_data(&data)?;
         } else if path.is_dir() {
             add_assets_to_zip(zip, &path, options).await?;
         }
@@ -92,12 +93,12 @@ async fn add_assets_to_zip(
 }
 
 trait WriteAll {
-    fn write_all(&mut self, data: &[u8]) -> Result<(), std::io::Error>;
+    fn write_all_data(&mut self, data: &[u8]) -> Result<(), std::io::Error>;
 }
 
 impl WriteAll for ZipWriter<std::fs::File> {
-    fn write_all(&mut self, data: &[u8]) -> Result<(), std::io::Error> {
-        self.write(data)?;
+    fn write_all_data(&mut self, data: &[u8]) -> Result<(), std::io::Error> {
+        self.write_all(data)?;
         Ok(())
     }
 }

@@ -1,6 +1,7 @@
 //! Error types for ForgeKit
 
 use thiserror::Error;
+use zip::result::ZipError;
 
 #[derive(Error, Debug)]
 pub enum ForgeKitError {
@@ -30,4 +31,10 @@ pub enum ForgeKitError {
     
     #[error("Template error: {0}")]
     TemplateError(String),
+    
+    #[error("ZIP error: {0}")]
+    Zip(#[from] ZipError),
+    
+    #[error("TOML serialization error: {0}")]
+    TomlSerialization(#[from] toml::ser::Error),
 }
