@@ -1,8 +1,9 @@
 {
   "name": "@ledokoz/forgekit",
   "version": "0.1.1",
-  "description": "Lightweight Node.js wrapper for ForgeKit CLI - Build .mox applications for Ledokoz OS",
+  "description": "TypeScript/JavaScript wrapper for ForgeKit CLI - Build .mox applications for Ledokoz OS",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "bin": "./bin/forgekit.js",
   "files": [
     "bin/",
@@ -11,11 +12,12 @@
     "LICENSE"
   ],
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint src/**/*.js",
+    "lint": "eslint src/**/*.js src/**/*.ts",
     "example": "node example.js",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "forgekit",
@@ -43,7 +45,9 @@
     "execa": "^5.1.1"
   },
   "devDependencies": {
+    "@types/node": "^16.11.12",
     "eslint": "^8.5.0",
-    "jest": "^27.4.5"
+    "jest": "^27.4.5",
+    "typescript": "^4.5.4"
   }
 }
