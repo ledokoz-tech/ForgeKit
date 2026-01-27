@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { execa } from 'execa';
+import execa from 'execa';
 import chalk from 'chalk';
 import ora from 'ora';
 import path from 'path';
@@ -300,7 +300,7 @@ class ForgeKit {
 export default ForgeKit;
 
 // If run directly, execute CLI commands
-if (import.meta.url === `file://${process.argv[1]}`) {
+if ( import.meta.url === `file://${process.argv[1]}`) {
   const [, , command, ...args] = process.argv;
   
   const forgekit = new ForgeKit({
