@@ -3,7 +3,6 @@
 import { execa } from 'execa';
 import chalk from 'chalk';
 import ora from 'ora';
-import fs from 'fs-extra';
 import path from 'path';
 
 // Get __dirname equivalent for ES modules
