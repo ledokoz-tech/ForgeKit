@@ -1,11 +1,9 @@
 {
   "name": "@ledokoz/forgekit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lightweight Node.js wrapper for ForgeKit CLI - Build .mox applications for Ledokoz OS",
   "main": "src/index.js",
-  "bin": {
-    "forgekit": "./bin/forgekit.js"
-  },
+  "bin": "./bin/forgekit.js",
   "files": [
     "bin/",
     "src/",
@@ -16,7 +14,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.js",
-    "example": "node example.js"
+    "example": "node example.js",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "forgekit",
@@ -31,7 +30,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ledokoz-tech/ForgeKit.git"
+    "url": "git+https://github.com/ledokoz-tech/ForgeKit.git"
   },
   "bugs": {
     "url": "https://github.com/ledokoz-tech/ForgeKit/issues"
