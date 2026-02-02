@@ -46,3 +46,6 @@ $RECYCLE.BIN/
 # Node Modules
 node_modules/
 package-lock.json
+
+# kiro
+.kiro
