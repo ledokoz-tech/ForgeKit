@@ -7,7 +7,6 @@ use crate::error::ForgeKitError;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-
 /// Cache statistics
 #[derive(Debug, Clone)]
 pub struct CacheStats {

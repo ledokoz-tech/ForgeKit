@@ -5,7 +5,6 @@
 use crate::error::ForgeKitError;
 use std::collections::HashMap;
 
-
 /// Build context passed to plugins
 #[derive(Debug, Clone)]
 pub struct BuildContext {
