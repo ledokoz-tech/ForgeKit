@@ -208,12 +208,19 @@ fn test_{}_error_case() {{
         let mut failed = 0;
 
         for line in output.lines() {
-            if line.contains("test result:") {
-                // Parse test result line
-                if let Some(ok_part) = line.split("ok.").next() {
-                    if let Some(count_str) = ok_part.split_whitespace().last() {
-                        if let Ok(count) = count_str.parse::<usize>() {
+            // Look for lines containing test results like "test result: ok. 5 passed; 0 failed"
+            if line.contains("test result:") && line.contains("ok.") {
+                // Use regex-like approach to extract numbers
+                // Find "X passed" and "Y failed"
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                for i in 0..parts.len() {
+                    if i > 0 && parts[i] == "passed" {
+                        if let Ok(count) = parts[i-1].parse::<usize>() {
                             passed = count;
+                        }
+                    } else if i > 0 && parts[i] == "failed" {
+                        if let Ok(count) = parts[i-1].parse::<usize>() {
+                            failed = count;
                         }
                     }
                 }
