@@ -206,7 +206,9 @@ fn glob_to_regex(pattern: &str) -> regex::Regex {
         .replace("*", ".*")
         .replace("?", ".");
 
-    regex::Regex::new(&format!("^{}$", regex_pattern)).unwrap_or_else(|_| regex::Regex::new(".*").unwrap())
+    regex::Regex::new(&format!("^{}$", regex_pattern)).unwrap_or_else(|_| {
+        regex::Regex::new(".*").unwrap()
+    })
 }
 
 #[cfg(test)]

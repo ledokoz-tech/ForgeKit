@@ -330,8 +330,8 @@ async fn main() -> Result<()> {
                 None => std::env::current_dir()?,
             };
 
-            let report = forgekit_core::validator::ProjectValidator::validate_project(&project_path)
-                .await?;
+            let report =
+                forgekit_core::validator::ProjectValidator::validate_project(&project_path).await?;
 
             if report.errors.is_empty() && report.warnings.is_empty() {
                 println!("✅ Project validation passed");
@@ -354,26 +354,31 @@ async fn main() -> Result<()> {
                 std::process::exit(1);
             }
         }
-        Commands::Env { command } => {
-            match command {
-                EnvCommands::Set { key, value, file } => {
-                    let env_file = file.unwrap_or_else(|| PathBuf::from(".env"));
-                    let mut manager = forgekit_core::env_manager::EnvManager::load_from_file(&env_file)?;
-                    manager.set(key.clone(), value.clone());
-                    manager.save_to_file(&env_file)?;
-                    println!("✅ Set {}={}", key, value);
-                }
-                EnvCommands::List { environment, path } => {
-                    let project_path = match path {
-                        Some(p) => p,
-                        None => std::env::current_dir()?,
-                    };
+        Commands::Env { command } => match command {
+            EnvCommands::Set { key, value, file } => {
+                let env_file = file.unwrap_or_else(|| PathBuf::from(".env"));
+                let mut manager =
+                    forgekit_core::env_manager::EnvManager::load_from_file(&env_file)?;
+                manager.set(key.clone(), value.clone());
+                manager.save_to_file(&env_file)?;
+                println!("✅ Set {}={}", key, value);
+            }
+            EnvCommands::List { environment, path } => {
+                let project_path = match path {
+                    Some(p) => p,
+                    None => std::env::current_dir()?,
+                };
 
-                    let manager = if let Some(env) = environment {
-                        forgekit_core::env_manager::EnvManager::load_for_environment(&env, &project_path)?
-                    } else {
-                        forgekit_core::env_manager::EnvManager::load_from_file(&project_path.join(".env"))?
-                    };
+                let manager = if let Some(env) = environment {
+                    forgekit_core::env_manager::EnvManager::load_for_environment(
+                        &env,
+                        &project_path,
+                    )?
+                } else {
+                    forgekit_core::env_manager::EnvManager::load_from_file(
+                        &project_path.join(".env"),
+                    )?
+                };
 
                     if manager.all().is_empty() {
                         println!("No environment variables set");
@@ -385,8 +390,12 @@ async fn main() -> Result<()> {
                     }
                 }
             }
-        }
-        Commands::Test { path, coverage, format } => {
+        },
+        Commands::Test {
+            path,
+            coverage,
+            format,
+        } => {
             let project_path = match path {
                 Some(p) => p,
                 None => std::env::current_dir()?,
@@ -394,7 +403,8 @@ async fn main() -> Result<()> {
 
             if coverage {
                 let (test_report, coverage_report) =
-                    forgekit_core::testing::TestRunner::run_tests_with_coverage(&project_path).await?;
+                    forgekit_core::testing::TestRunner::run_tests_with_coverage(&project_path)
+                        .await?;
 
                 if format == "json" {
                     let json = serde_json::json!({
@@ -417,7 +427,10 @@ async fn main() -> Result<()> {
                     println!("  Failed: {}", test_report.failed);
                     println!("\nCoverage:");
                     println!("  {:.2}%", coverage_report.coverage_percentage);
-                    println!("  Lines: {}/{}", coverage_report.lines_covered, coverage_report.total_lines);
+                    println!(
+                        "  Lines: {}/{}",
+                        coverage_report.lines_covered, coverage_report.total_lines
+                    );
                 }
             } else {
                 let report = forgekit_core::testing::TestRunner::run_tests(&project_path).await?;
@@ -450,42 +463,42 @@ async fn main() -> Result<()> {
                 None => std::env::current_dir()?,
             };
 
-            let test_file = forgekit_core::testing::TestRunner::generate_test_scaffold(&name, &project_path).await?;
+            let test_file =
+                forgekit_core::testing::TestRunner::generate_test_scaffold(&name, &project_path)
+                    .await?;
             println!("✅ Generated test scaffold at {:?}", test_file);
         }
-        Commands::Cache { command } => {
-            match command {
-                CacheCommands::Clear { path } => {
-                    let project_path = match path {
-                        Some(p) => p,
-                        None => std::env::current_dir()?,
-                    };
+        Commands::Cache { command } => match command {
+            CacheCommands::Clear { path } => {
+                let project_path = match path {
+                    Some(p) => p,
+                    None => std::env::current_dir()?,
+                };
 
-                    let cache_dir = project_path.join(".forgekit").join("cache");
-                    let mut cache = forgekit_core::cache::BuildCache::new(cache_dir)?;
-                    cache.clear().await?;
-                    println!("✅ Cache cleared");
-                }
-                CacheCommands::Stats { path } => {
-                    let project_path = match path {
-                        Some(p) => p,
-                        None => std::env::current_dir()?,
-                    };
-
-                    let cache_dir = project_path.join(".forgekit").join("cache");
-                    let mut cache = forgekit_core::cache::BuildCache::new(cache_dir)?;
-                    cache.load_from_disk()?;
-
-                    let stats = cache.stats();
-                    println!("Cache Statistics:");
-                    println!("  Items: {}", stats.item_count);
-                    println!("  Size: {} bytes", stats.total_size);
-                    println!("  Hits: {}", stats.hits);
-                    println!("  Misses: {}", stats.misses);
-                    println!("  Hit Rate: {:.2}%", stats.hit_rate * 100.0);
-                }
+                let cache_dir = project_path.join(".forgekit").join("cache");
+                let mut cache = forgekit_core::cache::BuildCache::new(cache_dir)?;
+                cache.clear().await?;
+                println!("✅ Cache cleared");
             }
-        }
+            CacheCommands::Stats { path } => {
+                let project_path = match path {
+                    Some(p) => p,
+                    None => std::env::current_dir()?,
+                };
+
+                let cache_dir = project_path.join(".forgekit").join("cache");
+                let mut cache = forgekit_core::cache::BuildCache::new(cache_dir)?;
+                cache.load_from_disk()?;
+
+                let stats = cache.stats();
+                println!("Cache Statistics:");
+                println!("  Items: {}", stats.item_count);
+                println!("  Size: {} bytes", stats.total_size);
+                println!("  Hits: {}", stats.hits);
+                println!("  Misses: {}", stats.misses);
+                println!("  Hit Rate: {:.2}%", stats.hit_rate * 100.0);
+            }
+        },
     }
 
     Ok(())

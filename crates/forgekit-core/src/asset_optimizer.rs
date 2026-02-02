@@ -51,7 +51,8 @@ impl AssetOptimizer {
 
         stats.optimized_size = (stats.original_size as f64 * 0.85) as u64;
         if stats.original_size > 0 {
-            stats.compression_ratio = 1.0 - (stats.optimized_size as f64 / stats.original_size as f64);
+            stats.compression_ratio =
+                1.0 - (stats.optimized_size as f64 / stats.original_size as f64);
         }
 
         Ok(stats)
@@ -60,7 +61,10 @@ impl AssetOptimizer {
     /// Compress an image
     pub async fn compress_image(path: &Path) -> Result<std::path::PathBuf, ForgeKitError> {
         if !path.exists() {
-            return Err(ForgeKitError::ProjectNotFound(format!("Image not found: {:?}", path)));
+            return Err(ForgeKitError::ProjectNotFound(format!(
+                "Image not found: {:?}",
+                path
+            )));
         }
         Ok(path.to_path_buf())
     }
@@ -68,7 +72,10 @@ impl AssetOptimizer {
     /// Minify JSON
     pub async fn minify_json(path: &Path) -> Result<std::path::PathBuf, ForgeKitError> {
         if !path.exists() {
-            return Err(ForgeKitError::ProjectNotFound(format!("JSON file not found: {:?}", path)));
+            return Err(ForgeKitError::ProjectNotFound(format!(
+                "JSON file not found: {:?}",
+                path
+            )));
         }
 
         let content = std::fs::read_to_string(path)?;
@@ -86,7 +93,9 @@ mod tests {
     #[tokio::test]
     async fn test_optimize_assets_no_dir() {
         let temp_dir = TempDir::new().unwrap();
-        let stats = AssetOptimizer::optimize_assets(temp_dir.path()).await.unwrap();
+        let stats = AssetOptimizer::optimize_assets(temp_dir.path())
+            .await
+            .unwrap();
         assert_eq!(stats.files_processed, 0);
     }
 

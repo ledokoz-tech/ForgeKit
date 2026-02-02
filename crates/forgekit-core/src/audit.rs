@@ -55,7 +55,9 @@ impl DependencyAuditor {
     pub async fn audit_dependencies(path: &Path) -> Result<AuditReport, ForgeKitError> {
         let cargo_toml = path.join("Cargo.toml");
         if !cargo_toml.exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         Ok(AuditReport {
@@ -73,7 +75,9 @@ impl DependencyAuditor {
     pub async fn check_for_updates(path: &Path) -> Result<Vec<UpdateSuggestion>, ForgeKitError> {
         let cargo_toml = path.join("Cargo.toml");
         if !cargo_toml.exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         Ok(Vec::new())
