@@ -3,12 +3,17 @@
 //! This crate provides the core functionality for building, packaging,
 //! and managing `.mox` applications for Ledokoz OS.
 
+pub mod asset_optimizer;
+pub mod audit;
 pub mod builder;
 pub mod cache;
 pub mod config;
 pub mod dependencies;
+pub mod dev_server;
+pub mod doc_generator;
 pub mod env_manager;
 pub mod error;
+pub mod multi_target;
 pub mod package_manager;
 pub mod packager;
 pub mod plugin;
