@@ -388,8 +388,8 @@ async fn main() -> Result<()> {
                             println!("  {}={}", key, value);
                         }
                     }
-                }
             }
+        }
         },
         Commands::Test {
             path,
