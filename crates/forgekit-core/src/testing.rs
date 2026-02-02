@@ -111,7 +111,8 @@ impl TestRunner {
         report.output = format!("{}\n{}", stdout, stderr);
 
         // Parse test results from output
-        Self::parse_test_output(&report.output, &mut report);
+        let output_copy = report.output.clone();
+        Self::parse_test_output(&output_copy, &mut report);
 
         Ok(report)
     }
