@@ -3,25 +3,35 @@
 //! This crate provides the core functionality for building, packaging,
 //! and managing `.mox` applications for Ledokoz OS.
 
+pub mod analytics;
 pub mod asset_optimizer;
 pub mod audit;
 pub mod builder;
 pub mod cache;
+pub mod cicd;
 pub mod config;
 pub mod dependencies;
 pub mod dev_server;
 pub mod doc_generator;
+pub mod docker;
 pub mod env_manager;
 pub mod error;
+pub mod i18n;
+pub mod migrations;
+pub mod monitoring;
 pub mod multi_target;
+pub mod openapi;
 pub mod package_manager;
 pub mod packager;
 pub mod plugin;
+pub mod profiler;
 pub mod project;
 pub mod registry;
+pub mod secrets;
 pub mod templates;
 pub mod testing;
 pub mod validator;
+pub mod version_manager;
 
 /// The main ForgeKit library
 pub struct ForgeKit;
