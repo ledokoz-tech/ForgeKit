@@ -118,7 +118,9 @@ impl TestRunner {
     }
 
     /// Run tests with coverage reporting
-    pub async fn run_tests_with_coverage(path: &Path) -> Result<(TestReport, CoverageReport), ForgeKitError> {
+    pub async fn run_tests_with_coverage(
+        path: &Path,
+    ) -> Result<(TestReport, CoverageReport), ForgeKitError> {
         let test_report = Self::run_tests(path).await?;
         let coverage_report = Self::generate_coverage_report(path).await?;
 
@@ -144,12 +146,7 @@ impl TestRunner {
         let file_count = walkdir::WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
-            .filter(|e| {
-                e.path()
-                    .extension()
-                    .map(|ext| ext == "rs")
-                    .unwrap_or(false)
-            })
+            .filter(|e| e.path().extension().map(|ext| ext == "rs").unwrap_or(false))
             .count();
 
         if file_count > 0 {
@@ -171,7 +168,10 @@ impl TestRunner {
     /// # Returns
     ///
     /// Path to the generated test file
-    pub async fn generate_test_scaffold(name: &str, path: &Path) -> Result<std::path::PathBuf, ForgeKitError> {
+    pub async fn generate_test_scaffold(
+        name: &str,
+        path: &Path,
+    ) -> Result<std::path::PathBuf, ForgeKitError> {
         let tests_dir = path.join("tests");
         if !tests_dir.exists() {
             std::fs::create_dir(&tests_dir)?;

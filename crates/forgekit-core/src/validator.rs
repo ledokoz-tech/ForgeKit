@@ -76,7 +76,10 @@ impl ProjectValidator {
     }
 
     /// Validate the forgekit.toml configuration file
-    async fn validate_config(path: &Path, report: &mut ValidationReport) -> Result<(), ForgeKitError> {
+    async fn validate_config(
+        path: &Path,
+        report: &mut ValidationReport,
+    ) -> Result<(), ForgeKitError> {
         let config_path = path.join("forgekit.toml");
 
         if !config_path.exists() {
@@ -127,7 +130,8 @@ impl ProjectValidator {
         let cargo_toml = path.join("Cargo.toml");
 
         if !cargo_toml.exists() {
-            report.add_warning("Cargo.toml not found - dependencies cannot be validated".to_string());
+            report
+                .add_warning("Cargo.toml not found - dependencies cannot be validated".to_string());
             return Ok(());
         }
 

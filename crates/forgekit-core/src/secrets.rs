@@ -20,11 +20,12 @@ impl SecretsManager {
     /// Decrypt a secret
     pub async fn decrypt_secret(encrypted: &str) -> Result<String, ForgeKitError> {
         if let Some(encoded) = encrypted.strip_prefix("encrypted:") {
-            let decoded = general_purpose::STANDARD
-                .decode(encoded)
-                .map_err(|_| ForgeKitError::InvalidConfig("Failed to decrypt secret".to_string()))?;
-            String::from_utf8(decoded)
-                .map_err(|_| ForgeKitError::InvalidConfig("Invalid UTF-8 in decrypted secret".to_string()))
+            let decoded = general_purpose::STANDARD.decode(encoded).map_err(|_| {
+                ForgeKitError::InvalidConfig("Failed to decrypt secret".to_string())
+            })?;
+            String::from_utf8(decoded).map_err(|_| {
+                ForgeKitError::InvalidConfig("Invalid UTF-8 in decrypted secret".to_string())
+            })
         } else {
             Ok(encrypted.to_string())
         }
