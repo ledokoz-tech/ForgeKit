@@ -4,7 +4,7 @@
 
 use crate::error::ForgeKitError;
 use std::collections::HashMap;
-use std::path::Path;
+
 
 /// Build context passed to plugins
 #[derive(Debug, Clone)]
