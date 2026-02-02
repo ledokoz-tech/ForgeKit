@@ -3,7 +3,7 @@
 //! This module provides functionality to validate ForgeKit projects,
 //! including configuration files, directory structure, and dependencies.
 
-use crate::config::Config;
+use crate::config::ProjectConfig;
 use crate::error::ForgeKitError;
 use std::path::Path;
 use walkdir::WalkDir;
