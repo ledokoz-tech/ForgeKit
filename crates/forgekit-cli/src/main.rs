@@ -378,9 +378,9 @@ async fn main() -> Result<()> {
                     forgekit_core::env_manager::EnvManager::load_from_file(
                         &project_path.join(".env"),
                     )?
-                }
+                };
 
-            if manager.all().is_empty() {
+                if manager.all().is_empty() {
                         println!("No environment variables set");
                     } else {
                         println!("Environment variables:");
