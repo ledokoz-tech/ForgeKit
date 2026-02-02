@@ -21,7 +21,7 @@ impl I18nManager {
 
     /// Load translations from a directory
     pub fn load_translations(path: &Path) -> Result<Self, ForgeKitError> {
-        let mut manager = Self::new();
+        let manager = Self::new();
         if path.exists() {
             // Load translation files
         }

@@ -162,7 +162,7 @@ impl EnvManager {
 
         // Replace $VAR_NAME patterns (word boundaries)
         for (key, val) in &self.env_vars {
-            let pattern = format!("${}", key);
+            let _pattern = format!("${}", key);
             // Only replace if followed by non-word character or end of string
             let mut new_result = String::new();
             let mut chars = result.chars().peekable();
