@@ -20,7 +20,9 @@ impl VersionManager {
     /// Bump the version
     pub async fn bump_version(path: &Path, bump_type: BumpType) -> Result<String, ForgeKitError> {
         if !path.join("Cargo.toml").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         let new_version = match bump_type {
@@ -35,7 +37,9 @@ impl VersionManager {
     /// Generate changelog
     pub async fn generate_changelog(path: &Path) -> Result<String, ForgeKitError> {
         if !path.join("Cargo.toml").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         Ok("# Changelog\n\n## [Unreleased]\n".to_string())

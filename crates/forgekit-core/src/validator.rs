@@ -176,12 +176,7 @@ impl ProjectValidator {
         let count = WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
-            .filter(|e| {
-                e.path()
-                    .extension()
-                    .map(|ext| ext == "rs")
-                    .unwrap_or(false)
-            })
+            .filter(|e| e.path().extension().map(|ext| ext == "rs").unwrap_or(false))
             .count();
 
         Ok(count)
