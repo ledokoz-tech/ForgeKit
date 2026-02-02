@@ -84,7 +84,7 @@ impl ProjectValidator {
             return Ok(());
         }
 
-        match Config::load(&config_path).await {
+        match ProjectConfig::load(&config_path) {
             Ok(config) => {
                 // Validate required fields
                 if config.name.is_empty() {
@@ -146,7 +146,7 @@ impl ProjectValidator {
     }
 
     /// Validate only the configuration
-    pub async fn validate_config_only(config: &Config) -> Result<(), ForgeKitError> {
+    pub async fn validate_config_only(config: &ProjectConfig) -> Result<(), ForgeKitError> {
         if config.name.is_empty() {
             return Err(ForgeKitError::InvalidConfig(
                 "Project name is required".to_string(),
