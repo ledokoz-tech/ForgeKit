@@ -27,7 +27,7 @@ impl MigrationManager {
             chrono::Local::now().format("%Y%m%d%H%M%S"),
             name
         ));
-        std::fs::write(&migration_file, "-- Migration: {}\n".to_string())?;
+        std::fs::write(&migration_file, "-- Migration: {}\n")?;
 
         Ok(migration_file)
     }
@@ -49,7 +49,7 @@ impl MigrationManager {
     }
 
     /// Rollback migrations
-    pub async fn rollback(path: &Path, steps: usize) -> Result<(), ForgeKitError> {
+    pub async fn rollback(_path: &Path, steps: usize) -> Result<(), ForgeKitError> {
         tracing::info!("Rolling back {} migration(s)", steps);
         Ok(())
     }
