@@ -61,7 +61,8 @@ impl PluginManager {
 
     /// Register a plugin
     pub fn register(&mut self, plugin: Box<dyn Plugin>) {
-        self.registry.insert(plugin.name().to_string(), plugin.version().to_string());
+        self.registry
+            .insert(plugin.name().to_string(), plugin.version().to_string());
         self.plugins.push(plugin);
     }
 
@@ -122,12 +123,18 @@ impl Plugin for ExamplePlugin {
     }
 
     fn on_pre_build(&self, context: &BuildContext) -> Result<(), ForgeKitError> {
-        tracing::info!("Example plugin: pre-build hook for {}", context.project_path);
+        tracing::info!(
+            "Example plugin: pre-build hook for {}",
+            context.project_path
+        );
         Ok(())
     }
 
     fn on_post_build(&self, context: &BuildContext) -> Result<(), ForgeKitError> {
-        tracing::info!("Example plugin: post-build hook for {}", context.project_path);
+        tracing::info!(
+            "Example plugin: post-build hook for {}",
+            context.project_path
+        );
         Ok(())
     }
 }

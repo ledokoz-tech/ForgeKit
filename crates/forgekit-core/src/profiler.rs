@@ -35,7 +35,9 @@ impl Profiler {
     /// Profile a build
     pub async fn profile_build(path: &Path) -> Result<ProfileReport, ForgeKitError> {
         if !path.join("Cargo.toml").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         Ok(ProfileReport {
@@ -47,7 +49,9 @@ impl Profiler {
     /// Analyze memory usage
     pub async fn analyze_memory(path: &Path) -> Result<MemoryReport, ForgeKitError> {
         if !path.join("Cargo.toml").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         Ok(MemoryReport {

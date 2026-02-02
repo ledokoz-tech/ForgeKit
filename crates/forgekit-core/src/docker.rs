@@ -25,7 +25,9 @@ CMD ["./target/release/app"]
     /// Build Docker image
     pub async fn build_image(path: &Path) -> Result<String, ForgeKitError> {
         if !path.join("Dockerfile").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Dockerfile not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Dockerfile not found".to_string(),
+            ));
         }
 
         Ok("image:latest".to_string())
@@ -151,9 +153,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         fs::write(temp_dir.path().join("Dockerfile"), "FROM rust:latest").unwrap();
 
-        let image_name = DockerBuilder::build_image(temp_dir.path())
-            .await
-            .unwrap();
+        let image_name = DockerBuilder::build_image(temp_dir.path()).await.unwrap();
 
         assert_eq!(image_name, "image:latest");
     }
@@ -259,11 +259,7 @@ mod tests {
 
         // Create initial files
         fs::write(temp_dir.path().join("Dockerfile"), "FROM ubuntu:latest").unwrap();
-        fs::write(
-            temp_dir.path().join("docker-compose.yml"),
-            "version: '2'",
-        )
-        .unwrap();
+        fs::write(temp_dir.path().join("docker-compose.yml"), "version: '2'").unwrap();
 
         // Generate new files (should overwrite)
         DockerBuilder::generate_dockerfile(temp_dir.path())
@@ -306,17 +302,13 @@ mod tests {
         DockerBuilder::generate_dockerfile(temp_dir.path())
             .await
             .unwrap();
-        let first_build = DockerBuilder::build_image(temp_dir.path())
-            .await
-            .unwrap();
+        let first_build = DockerBuilder::build_image(temp_dir.path()).await.unwrap();
 
         // Second operation
         DockerBuilder::generate_compose(temp_dir.path())
             .await
             .unwrap();
-        let second_build = DockerBuilder::build_image(temp_dir.path())
-            .await
-            .unwrap();
+        let second_build = DockerBuilder::build_image(temp_dir.path()).await.unwrap();
 
         // Both should succeed
         assert_eq!(first_build, "image:latest");
@@ -355,7 +347,8 @@ mod tests {
         DockerBuilder::generate_compose(temp_dir.path())
             .await
             .unwrap();
-        let second_content = fs::read_to_string(temp_dir.path().join("docker-compose.yml")).unwrap();
+        let second_content =
+            fs::read_to_string(temp_dir.path().join("docker-compose.yml")).unwrap();
 
         // Content should be identical
         assert_eq!(first_content, second_content);

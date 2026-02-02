@@ -119,7 +119,10 @@ impl EnvManager {
 
     /// Get an environment variable or a default value
     pub fn get_or<'a>(&'a self, key: &str, default: &'a str) -> &'a str {
-        self.env_vars.get(key).map(|v| v.as_str()).unwrap_or(default)
+        self.env_vars
+            .get(key)
+            .map(|v| v.as_str())
+            .unwrap_or(default)
     }
 
     /// Set an environment variable

@@ -22,7 +22,11 @@ impl MigrationManager {
         let migrations_dir = std::path::PathBuf::from("migrations");
         std::fs::create_dir_all(&migrations_dir)?;
 
-        let migration_file = migrations_dir.join(format!("{}_{}.sql", chrono::Local::now().format("%Y%m%d%H%M%S"), name));
+        let migration_file = migrations_dir.join(format!(
+            "{}_{}.sql",
+            chrono::Local::now().format("%Y%m%d%H%M%S"),
+            name
+        ));
         std::fs::write(&migration_file, "-- Migration: {}\n".to_string())?;
 
         Ok(migration_file)

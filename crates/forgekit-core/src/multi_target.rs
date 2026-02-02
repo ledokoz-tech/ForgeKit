@@ -44,9 +44,15 @@ impl MultiTargetBuilder {
     }
 
     /// Build for a specific target
-    pub async fn build_target(&self, path: &Path, target: &str) -> Result<BuildOutput, ForgeKitError> {
+    pub async fn build_target(
+        &self,
+        path: &Path,
+        target: &str,
+    ) -> Result<BuildOutput, ForgeKitError> {
         if !path.join("Cargo.toml").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         Ok(BuildOutput {

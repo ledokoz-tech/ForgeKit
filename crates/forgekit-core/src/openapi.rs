@@ -12,7 +12,9 @@ impl OpenAPIGenerator {
     /// Generate OpenAPI specification
     pub async fn generate_spec(path: &Path) -> Result<String, ForgeKitError> {
         if !path.join("Cargo.toml").exists() {
-            return Err(ForgeKitError::ProjectNotFound("Cargo.toml not found".to_string()));
+            return Err(ForgeKitError::ProjectNotFound(
+                "Cargo.toml not found".to_string(),
+            ));
         }
 
         let spec = r#"{
