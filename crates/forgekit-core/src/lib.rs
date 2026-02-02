@@ -4,14 +4,19 @@
 //! and managing `.mox` applications for Ledokoz OS.
 
 pub mod builder;
+pub mod cache;
 pub mod config;
 pub mod dependencies;
+pub mod env_manager;
 pub mod error;
 pub mod package_manager;
 pub mod packager;
+pub mod plugin;
 pub mod project;
 pub mod registry;
 pub mod templates;
+pub mod testing;
+pub mod validator;
 
 /// The main ForgeKit library
 pub struct ForgeKit;
