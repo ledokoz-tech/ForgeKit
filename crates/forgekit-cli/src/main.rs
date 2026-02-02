@@ -381,16 +381,16 @@ async fn main() -> Result<()> {
                 };
 
                 if manager.all().is_empty() {
-                        println!("No environment variables set");
-                    } else {
-                        println!("Environment variables:");
-                        for (key, value) in manager.all() {
-                            println!("  {}={}", key, value);
-                        }
+                    println!("No environment variables set");
+                } else {
+                    println!("Environment variables:");
+                    for (key, value) in manager.all() {
+                        println!("  {}={}", key, value);
                     }
+                }
             }
         },
-        
+
         Commands::Test {
             path,
             coverage,
@@ -467,7 +467,7 @@ async fn main() -> Result<()> {
                 forgekit_core::testing::TestRunner::generate_test_scaffold(&name, &project_path)
                     .await?;
             println!("✅ Generated test scaffold at {:?}", test_file);
-        },
+        }
         Commands::Cache { command } => match command {
             CacheCommands::Clear { path } => {
                 let project_path = match path {
