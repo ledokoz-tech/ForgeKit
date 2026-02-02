@@ -389,8 +389,8 @@ async fn main() -> Result<()> {
                         }
                     }
             }
-        }
         },
+        
         Commands::Test {
             path,
             coverage,
@@ -467,7 +467,7 @@ async fn main() -> Result<()> {
                 forgekit_core::testing::TestRunner::generate_test_scaffold(&name, &project_path)
                     .await?;
             println!("✅ Generated test scaffold at {:?}", test_file);
-        }
+        },
         Commands::Cache { command } => match command {
             CacheCommands::Clear { path } => {
                 let project_path = match path {
