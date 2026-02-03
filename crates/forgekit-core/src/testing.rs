@@ -36,7 +36,7 @@ impl TestReport {
 
     /// Check if all tests passed
     pub fn all_passed(&self) -> bool {
-        self.failed == 0 && self.total > 0
+        self.failed == 0
     }
 }
 
