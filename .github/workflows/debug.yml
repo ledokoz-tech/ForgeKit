@@ -1,9 +1,0 @@
-name: Debug Workflow
-
-on: [push]
-
-jobs:
-  debug:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Debug workflow is working"
