@@ -215,11 +215,11 @@ fn test_{}_error_case() {{
                 let parts: Vec<&str> = line.split_whitespace().collect();
                 for i in 0..parts.len() {
                     if i > 0 && parts[i] == "passed" {
-                        if let Ok(count) = parts[i-1].parse::<usize>() {
+                        if let Ok(count) = parts[i - 1].parse::<usize>() {
                             passed = count;
                         }
                     } else if i > 0 && parts[i] == "failed" {
-                        if let Ok(count) = parts[i-1].parse::<usize>() {
+                        if let Ok(count) = parts[i - 1].parse::<usize>() {
                             failed = count;
                         }
                     }
