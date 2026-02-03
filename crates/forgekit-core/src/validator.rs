@@ -224,6 +224,14 @@ mod tests {
             r#"
 name = "test-project"
 version = "0.1.0"
+authors = ["Test Author <test@example.com>"]
+dependencies = []
+
+[build]
+target = "ledokoz"
+opt_level = "2"
+rustflags = []
+output_dir = "target"
 "#,
         )
         .unwrap();
@@ -245,6 +253,14 @@ version = "0.1.0"
             r#"
 name = "test-project"
 version = "0.1.0"
+authors = ["Test Author <test@example.com>"]
+dependencies = []
+
+[build]
+target = "ledokoz"
+opt_level = "2"
+rustflags = []
+output_dir = "target"
 "#,
         )
         .unwrap();
